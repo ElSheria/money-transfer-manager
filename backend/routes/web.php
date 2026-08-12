@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => response()->json([
+    'name' => 'ABT-LACOLOMBE API',
+    'status' => 'ready',
+]));
