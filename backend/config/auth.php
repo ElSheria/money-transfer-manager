@@ -114,4 +114,18 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | API Token Lifetime
+    |--------------------------------------------------------------------------
+    |
+    | Durée de validité de notre token API personnalisé.
+    | La valeur est exprimée en heures.
+    |
+    | Ce token est utilisé par Angular avec :
+    | Authorization: Bearer <token>
+    |
+    */
+    'api_token_ttl_hours' => (int) env('API_TOKEN_TTL_HOURS', 12),
+
 ];
