@@ -239,11 +239,42 @@ class TransferController extends Controller
     private function exportRules(): array
     {
         return [
-            'from' => ['nullable', 'date'],
-            'to' => ['nullable', 'date', 'after_or_equal:from'],
-            'agency_id' => ['nullable', 'integer', 'exists:agencies,id'],
-            'currency' => ['nullable', 'in:USD,CDF'],
-            'status' => ['nullable', 'string', 'max:32'],
+            // Date de début facultative.
+            'from' => [
+                'nullable',
+                'date',
+            ],
+
+            // La date de fin ne peut pas être antérieure
+            // à la date de début.
+            'to' => [
+                'nullable',
+                'date',
+                'after_or_equal:from',
+            ],
+
+            // L'agence doit réellement exister.
+            'agency_id' => [
+                'nullable',
+                'integer',
+                'exists:agencies,id',
+            ],
+
+            // Notre application accepte uniquement USD et CDF.
+            'currency' => [
+                'nullable',
+                'in:USD,CDF',
+            ],
+
+            // Empêche l'utilisation de statuts inventés.
+            'status' => [
+                'nullable',
+                Rule::in([
+                    Transfer::STATUS_VALIDATED,
+                    Transfer::STATUS_WITHDRAWN,
+                    Transfer::STATUS_CANCELLED,
+                ]),
+            ],
         ];
     }
 }
