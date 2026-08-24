@@ -30,14 +30,23 @@ class SystemSettingTest extends TestCase
             ->assertJsonPath('data.value.USD.rate', 3);
     }
 
-    private function tokenFor(User $user): string
-    {
+    private function tokenFor(User $user): string {
         $token = Str::random(80);
 
         ApiToken::create([
+            // Utilisateur authentifié durant le test.
             'user_id' => $user->id,
+
+            // Permet d'identifier facilement les tokens de test.
             'name' => 'test',
-            'token_hash' => hash('sha256', $token),
+
+            // Le token n'est jamais enregistré en clair.
+            'token_hash' => hash('sha256', $plainToken),
+
+            // Rend le token valide pour notre middleware.
+            'expires_at' => now()->addHours(
+                (int) config('auth.api_token_ttl_hours', 12)
+            ),
         ]);
 
         return $token;
