@@ -53,16 +53,31 @@ class TransferNotificationTest extends TestCase
         ];
     }
 
-    private function tokenFor(User $user): string
-    {
+    // Crée un token API valide pour authentifier un utilisateur pendant les tests.
+    private function tokenFor(User $user): string {
+        // Génère le token brut utilisé dans :
+        // Authorization: Bearer <token>
         $token = Str::random(80);
 
         ApiToken::create([
+            // Utilisateur propriétaire du token.
             'user_id' => $user->id,
+
+            // Nom utilisé uniquement pour identifier le token de test.
             'name' => 'test',
+
+            // Comme dans l'application réelle,
+            // seul le hash du token est stocké en base.
             'token_hash' => hash('sha256', $token),
+
+            // Le middleware exige maintenant
+            // une date d'expiration future.
+            'expires_at' => now()->addHours(
+                (int) config('auth.api_token_ttl_hours', 12)
+            ),
         ]);
 
+        // Retourne le token brut utilisé par withToken().
         return $token;
     }
 }
