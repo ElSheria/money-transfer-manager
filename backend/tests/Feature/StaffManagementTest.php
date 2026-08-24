@@ -89,16 +89,31 @@ class StaffManagementTest extends TestCase
         ])->assertUnprocessable();
     }
 
-    private function tokenFor(User $user): string
-    {
+    // Crée un token API valide pour authentifier un utilisateur pendant les tests.
+    private function tokenFor(User $user): string {
+        // Génère le token brut qui sera envoyé dans :
+        // Authorization: Bearer <token>
         $token = Str::random(80);
 
         ApiToken::create([
+            // Utilisateur auquel appartient le token.
             'user_id' => $user->id,
+
+            // Nom du token utilisé uniquement pour les tests.
             'name' => 'test',
+
+            // Comme dans l'application réelle,
+            // le token n'est jamais enregistré en clair.
             'token_hash' => hash('sha256', $token),
+
+            // Le middleware exige maintenant une date
+            // d'expiration future pour accepter le token.
+            'expires_at' => now()->addHours(
+                (int) config('auth.api_token_ttl_hours', 12)
+            ),
         ]);
 
+        // Retourne le token brut pour withToken().
         return $token;
     }
 }
