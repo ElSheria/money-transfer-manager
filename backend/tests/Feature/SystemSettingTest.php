@@ -30,25 +30,30 @@ class SystemSettingTest extends TestCase
             ->assertJsonPath('data.value.USD.rate', 3);
     }
 
+    // Crée un token API valide pour authentifier un utilisateur pendant les tests.
     private function tokenFor(User $user): string {
+        // Génère le token brut utilisé dans :
+        // Authorization: Bearer <token>
         $token = Str::random(80);
 
         ApiToken::create([
-            // Utilisateur authentifié durant le test.
+            // Utilisateur auquel appartient le token.
             'user_id' => $user->id,
 
-            // Permet d'identifier facilement les tokens de test.
+            // Nom permettant d'identifier le token de test.
             'name' => 'test',
 
-            // Le token n'est jamais enregistré en clair.
-            'token_hash' => hash('sha256', $plainToken),
+            // On stocke uniquement le hash du token.
+            'token_hash' => hash('sha256', $token),
 
-            // Rend le token valide pour notre middleware.
+            // Rend le token valide pour le middleware
+            // qui vérifie maintenant son expiration.
             'expires_at' => now()->addHours(
                 (int) config('auth.api_token_ttl_hours', 12)
             ),
         ]);
 
+        // Retourne le token brut à withToken().
         return $token;
     }
 }
